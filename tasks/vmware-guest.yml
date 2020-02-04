@@ -1,0 +1,109 @@
+---
+- name: Find the Guest's folder ( search if the machine already exist in any of the Vcenter folders )
+  vmware_guest_find: 
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    validate_certs: no
+    name: "{{ vmguest_name|upper }}"
+  register: vmware_guest_folder_name
+  ignore_errors: True
+
+#- debug:
+#    var: vmware_guest_folder_name
+
+
+- name: create or power-on the VM and wait for the IP address.
+  vmware_guest:
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}" 
+    password: "{{ vcenter_password }}"
+    validate_certs: no
+    datacenter: "{{ vcenter_datacenter }}" 
+    cluster: "{{ vcenter_cluster }}"
+    folder: "{{ vmware_guest_folder_name.folders | default(vcenter_folder) }}"
+    name: "{{ vmguest_name|upper }}"
+    name_match: last
+    state: "{{ vmguest_state }}"
+    guest_id: "{{ vmguest_id }}"
+    disk: "{{ vm_guest_disks }}"
+    hardware:
+      memory_mb: "{{ vmguest_memory }}"
+      num_cpus: "{{ vmguest_num_cpu }}"
+      scsi: paravirtual
+    networks: "{{ vm_guest_networks }}"
+    template: "{{ vmguest_template }}"
+    customization:
+      hostname: "{{ vmguest_name|lower }}"
+    wait_for_ip_address: "{{ vmguest_wait_for_ip_address }}"
+  register: deploy
+  when: vmguest_state == "poweredon" and esxi_hostname is not defined
+
+- name: Annouce the ARP/MAC address by pinging the local gateway.
+  vmware_vm_shell:
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}" 
+    password: "{{ vcenter_password }}"
+    validate_certs: no
+    datacenter: "{{ vcenter_datacenter }}" 
+    cluster: "{{ vcenter_cluster }}"
+    folder: "{{ vmware_guest_folder_name.folders | default(vcenter_folder) }}"
+    vm_id: "{{ vmguest_name|upper }}"
+    vm_username: "{{ vmguest_template_username }}"
+    vm_password: "{{ vmguest_template_password }}"
+    vm_shell: "/bin/ping"
+    vm_shell_args: "-c 1 {{ vmguest_gateway }}"
+  when: vmguest_state == "poweredon" and esxi_hostname is not defined
+  ignore_errors: True
+
+- name: create or power-on the VM on ESXi and wait for the IP address.
+  vmware_guest:
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}" 
+    password: "{{ vcenter_password }}"
+    validate_certs: no
+    datacenter: "{{ vcenter_datacenter }}" 
+    esxi_hostname: "{{ esxi_hostname }}"
+    folder: "{{ vmware_guest_folder_name.folders | default(vcenter_folder) }}"
+    name: "{{ vmguest_name|upper }}"
+    name_match: last
+    state: "{{ vmguest_state }}"
+    guest_id: "{{ vmguest_id }}"
+    disk: "{{ vm_guest_disks }}"
+    hardware:
+      memory_mb: "{{ vmguest_memory }}"
+      num_cpus: "{{ vmguest_num_cpu }}"
+      scsi: paravirtual
+    networks: "{{ vm_guest_networks }}"
+    template: "{{ vmguest_template }}"
+    customization:
+      hostname: "{{ vmguest_name|lower }}"
+    wait_for_ip_address: "{{ vmguest_wait_for_ip_address }}"
+  register: deploy
+  when: vmguest_state == "poweredon" and esxi_hostname is defined
+
+- name: Power Off the VM
+  vmware_guest:
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    validate_certs: no
+    datacenter: "{{ vcenter_datacenter }}"
+    cluster: "{{ vcenter_cluster }}"
+    folder: "{{ vmware_guest_folder_name.folders | default(vcenter_folder) }}"
+    name: "{{ vmguest_name|upper }}"
+    state: poweredoff
+  when: vmguest_state == "poweredoff" or vmguest_state == "absent" and esxi_hostname is not defined
+
+- name: Delete the VM ( this will only work when the variable delete_machine is defined )
+  vmware_guest:
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    validate_certs: no
+    datacenter: "{{ vcenter_datacenter }}"
+    cluster: "{{ vcenter_cluster }}"
+    folder: "{{ vmware_guest_folder_name.folders | default(vcenter_folder) }}"
+    name: "{{ vmguest_name|upper }}"
+    state: absent
+  when: vmguest_state == "absent" and delete_machine is defined and esxi_hostname is not defined
