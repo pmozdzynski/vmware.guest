@@ -9,8 +9,8 @@ vm_guest_networks:
       - name: "{{ vmguest_vlan }}"
         ip: "{{ vmguest_ip }}"
         type: "{{ vmguest_network_type }}"
-        netmask: "{{ vmguest_netmask }}"
-        gateway: "{{ vmguest_gateway }}"
+        #netmask: "{{ vmguest_netmask }}"
+        #gateway: "{{ vmguest_gateway }}"
         dns_servers:
           - "{{ nameserver1 }}"
           - "{{ nameserver2 }}"
