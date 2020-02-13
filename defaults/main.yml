@@ -8,6 +8,7 @@ vm_guest_disks:
 vm_guest_networks:
       - name: "{{ vmguest_vlan }}"
         ip: "{{ vmguest_ip }}"
+        type: "{{ vmguest_network_type }}"
         netmask: "{{ vmguest_netmask }}"
         gateway: "{{ vmguest_gateway }}"
         dns_servers:
@@ -15,4 +16,4 @@ vm_guest_networks:
           - "{{ nameserver2 }}"
         domain: "{{ vmguest_domain }}"
 vmguest_template_username: root
-
+vmguest_network_type: dhcp
