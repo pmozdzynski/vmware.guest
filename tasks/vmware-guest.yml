@@ -22,7 +22,6 @@
     datacenter: "{{ vcenter_datacenter }}" 
     cluster: "{{ vcenter_cluster }}"
     folder: "{{ vmware_guest_folder_name.folders | default(vcenter_folder) }}"
-    customization_spec: Centos7
     name: "{{ vmguest_name|upper }}"
     name_match: last
     state: "{{ vmguest_state }}"
