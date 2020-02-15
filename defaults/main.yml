@@ -14,5 +14,6 @@ vm_guest_networks:
           - "{{ nameserver1 }}"
           - "{{ nameserver2 }}"
         domain: "{{ vmguest_domain }}"
-vmguest_template_username: root
+vmguest_template_username: ansible
+vmguest_template_password: qaz123
 
