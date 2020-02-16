@@ -63,7 +63,7 @@
     validate_certs: no
     datacenter: "{{ vcenter_datacenter }}" 
     cluster: "{{ vcenter_cluster }}"
-    folder: "{{ vmware_guest_folder_name.folders | default(vcenter_folder) }}"
+    folder: "/{{ vcenter_datacenter }}/vm/{{ vcenter_folder }}"
     name: "{{ vmguest_name|upper }}"
     name_match: last
     state: "{{ vmguest_state }}"
@@ -100,7 +100,7 @@
     validate_certs: no
     datacenter: "{{ vcenter_datacenter }}" 
     cluster: "{{ vcenter_cluster }}"
-    folder: "{{ vmware_guest_folder_name.folders | default(vcenter_folder) }}"
+    folder: "/{{ vcenter_datacenter }}/vm/{{ vcenter_folder }}"
     vm_id: "{{ vmguest_name|upper }}"
     vm_username: "{{ vmguest_template_username }}"
     vm_password: "{{ vmguest_template_password }}"
@@ -117,7 +117,7 @@
     validate_certs: no
     datacenter: "{{ vcenter_datacenter }}" 
     esxi_hostname: "{{ esxi_hostname }}"
-    folder: "{{ vmware_guest_folder_name.folders | default(vcenter_folder) }}"
+    folder: "/{{ vcenter_datacenter }}/vm/{{ vcenter_folder }}"
     name: "{{ vmguest_name|upper }}"
     name_match: last
     state: "{{ vmguest_state }}"
