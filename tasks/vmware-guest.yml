@@ -20,8 +20,9 @@
     username: '{{ vcenter_username }}'
     password: '{{ vcenter_password }}'
     datacenter: "{{ vcenter_datacenter }}" 
-    folder_name: "{{ vmware_guest_folder_name.folders | default(vcenter_folder) }}"
+    folder_name: "{{ vcenter_folder }}"
     folder_type: vm
+    parent_folder: vm_folder
     state: present
   register: vm_folder_creation_result
 
