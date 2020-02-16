@@ -9,8 +9,8 @@
   register: vmware_guest_folder_name
   ignore_errors: True
 
-#- debug:
-#    var: vmware_guest_folder_name
+- debug:
+    var: vmware_guest_folder_name
 
 
 - name: create or power-on the VM and wait for the IP address dynamically assigned(DHCP).
