@@ -15,6 +15,7 @@
 
 - name: Create a VM folder on given datacenter
   vcenter_folder:
+    validate_certs: no
     hostname: '{{ vcenter_hostname }}'
     username: '{{ vcenter_username }}'
     password: '{{ vcenter_password }}'
