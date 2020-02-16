@@ -13,6 +13,20 @@
     var: vmware_guest_folder_name
 
 
+- name: Create a VM folder on given datacenter
+  vcenter_folder:
+    hostname: '{{ vcenter_hostname }}'
+    username: '{{ vcenter_username }}'
+    password: '{{ vcenter_password }}'
+    datacenter: "{{ vcenter_datacenter }}" 
+    dest_folder: "{{ vmware_guest_folder_name.folders }}"
+    folder_type: vm
+    state: present
+  register: vm_folder_creation_result
+
+  -debug:  
+     var: vm_folder_creation_result
+
 - name: create or power-on the VM and wait for the IP address dynamically assigned(DHCP).
   vmware_guest:
     hostname: "{{ vcenter_hostname }}"
