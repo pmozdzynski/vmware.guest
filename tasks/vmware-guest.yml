@@ -13,7 +13,7 @@
 #    var: vmware_guest_folder_name
 
 
-- name: create or power-on the VM and wait for the IP address.
+- name: create or power-on the VM and wait for the IP address dynamically assigned(DHCP).
   vmware_guest:
     hostname: "{{ vcenter_hostname }}"
     username: "{{ vcenter_username }}" 
@@ -31,13 +31,39 @@
       memory_mb: "{{ vmguest_memory }}"
       num_cpus: "{{ vmguest_num_cpu }}"
       scsi: paravirtual
-    networks: "{{ vm_guest_networks }}"
+    networks: "{{ vm_guest_networks_dhcp }}"
     template: "{{ vmguest_template }}"
     customization:
       hostname: "{{ vmguest_name|lower }}"
     wait_for_ip_address: "{{ vmguest_wait_for_ip_address }}"
   register: deploy
-  when: vmguest_state == "poweredon" and esxi_hostname is not defined
+  when: vmguest_state == "poweredon" and esxi_hostname is not defined and vmguest_network_type == "dhcp" 
+
+- name: create or power-on the VM and wait for the IP address (static).
+  vmware_guest:
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}" 
+    password: "{{ vcenter_password }}"
+    validate_certs: no
+    datacenter: "{{ vcenter_datacenter }}" 
+    cluster: "{{ vcenter_cluster }}"
+    folder: "{{ vmware_guest_folder_name.folders | default(vcenter_folder) }}"
+    name: "{{ vmguest_name|upper }}"
+    name_match: last
+    state: "{{ vmguest_state }}"
+    guest_id: "{{ vmguest_id }}"
+    disk: "{{ vm_guest_disks }}"
+    hardware:
+      memory_mb: "{{ vmguest_memory }}"
+      num_cpus: "{{ vmguest_num_cpu }}"
+      scsi: paravirtual
+    networks: "{{ vm_guest_networks_static }}"
+    template: "{{ vmguest_template }}"
+    customization:
+      hostname: "{{ vmguest_name|lower }}"
+    wait_for_ip_address: "{{ vmguest_wait_for_ip_address }}"
+  register: deploy
+  when: vmguest_state == "poweredon" and esxi_hostname is not defined and vmguest_network_type == "static"
 
 - name: Annouce the ARP/MAC address by pinging the local gateway.
   vmware_vm_shell:
