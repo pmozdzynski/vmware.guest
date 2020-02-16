@@ -37,7 +37,7 @@
       hostname: "{{ vmguest_name|lower }}"
     wait_for_ip_address: "{{ vmguest_wait_for_ip_address }}"
   args:
-     warn: false
+    warn: false
   register: deploy
   when: vmguest_state == "poweredon" and esxi_hostname is not defined and vmguest_network_type == "dhcp" 
 
@@ -65,7 +65,7 @@
       hostname: "{{ vmguest_name|lower }}"
     wait_for_ip_address: "{{ vmguest_wait_for_ip_address }}"
   args:
-     warn: false
+    warn: false
   register: deploy
   when: vmguest_state == "poweredon" and esxi_hostname is not defined and vmguest_network_type == "static"
 
