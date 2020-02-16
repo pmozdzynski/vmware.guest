@@ -36,10 +36,10 @@
     customization:
       hostname: "{{ vmguest_name|lower }}"
     wait_for_ip_address: "{{ vmguest_wait_for_ip_address }}"
-  args:
-    warn: false
   register: deploy
   when: vmguest_state == "poweredon" and esxi_hostname is not defined and vmguest_network_type == "dhcp" 
+  args:
+    warn: false
 
 - name: create or power-on the VM and wait for the IP address (static).
   vmware_guest:
@@ -64,10 +64,10 @@
     customization:
       hostname: "{{ vmguest_name|lower }}"
     wait_for_ip_address: "{{ vmguest_wait_for_ip_address }}"
-  args:
-    warn: false
   register: deploy
   when: vmguest_state == "poweredon" and esxi_hostname is not defined and vmguest_network_type == "static"
+  args:
+    warn: false
 
 - name: Annouce the ARP/MAC address by pinging the local gateway.
   vmware_vm_shell:
