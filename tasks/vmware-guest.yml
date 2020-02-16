@@ -19,7 +19,7 @@
     username: '{{ vcenter_username }}'
     password: '{{ vcenter_password }}'
     datacenter: "{{ vcenter_datacenter }}" 
-    dest_folder: "{{ vmware_guest_folder_name.folders }}"
+    dest_folder: "{{ vmware_guest_folder_name }}"
     folder_type: vm
     state: present
   register: vm_folder_creation_result
