@@ -65,6 +65,17 @@
   register: deploy
   when: vmguest_state == "poweredon" and esxi_hostname is not defined and vmguest_network_type == "static"
 
+- name: Move Virtual Machine if not in the right folder
+  vmware_guest_move:
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    datacenter: "{{ vcenter_datacenter }}" 
+    validate_certs: no
+    name: "{{ vmguest_name|upper }}"
+    dest_folder: "{{ vmware_guest_folder_name.folders | default(vcenter_folder) }}"
+    #  delegate_to: localhost
+
 - name: Annouce the ARP/MAC address by pinging the local gateway.
   vmware_vm_shell:
     hostname: "{{ vcenter_hostname }}"
