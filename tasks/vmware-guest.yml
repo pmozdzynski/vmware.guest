@@ -22,7 +22,6 @@
     datacenter: "{{ vcenter_datacenter }}" 
     folder_name: "{{ vcenter_folder }}"
     folder_type: vm
-    parent_folder: vm_folder
     state: present
   register: vm_folder_creation_result
 
