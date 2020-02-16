@@ -20,7 +20,7 @@
     username: '{{ vcenter_username }}'
     password: '{{ vcenter_password }}'
     datacenter: "{{ vcenter_datacenter }}" 
-    folder_name: "{{ vcenter_folder }}"
+    folder_name: "/{{ vcenter_datacenter }}/vm/{{ vcenter_folder }}"
     folder_type: vm
     state: present
   register: vm_folder_creation_result
@@ -143,7 +143,7 @@
     validate_certs: no
     datacenter: "{{ vcenter_datacenter }}"
     cluster: "{{ vcenter_cluster }}"
-    folder: "{{ vmware_guest_folder_name.folders | default(vcenter_folder) }}"
+    folder: "/{{ vcenter_datacenter }}/vm/{{ vcenter_folder }}"
     name: "{{ vmguest_name|upper }}"
     state: poweredoff
   when: vmguest_state == "poweredoff" or vmguest_state == "absent" and esxi_hostname is not defined
@@ -156,7 +156,7 @@
     validate_certs: no
     datacenter: "{{ vcenter_datacenter }}"
     cluster: "{{ vcenter_cluster }}"
-    folder: "{{ vmware_guest_folder_name.folders | default(vcenter_folder) }}"
+    folder: "/{{ vcenter_datacenter }}/vm/{{ vcenter_folder }}"
     name: "{{ vmguest_name|upper }}"
     state: absent
   when: vmguest_state == "absent" and delete_machine is defined and esxi_hostname is not defined
