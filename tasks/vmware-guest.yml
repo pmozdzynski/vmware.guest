@@ -73,7 +73,7 @@
     datacenter: "{{ vcenter_datacenter }}" 
     validate_certs: no
     name: "{{ vmguest_name|upper }}"
-    dest_folder: "{{ vmware_guest_folder_name |string }}"
+    dest_folder: "{{ vmware_guest_folder_name.folders }}"
     #  delegate_to: localhost
 
 - name: Annouce the ARP/MAC address by pinging the local gateway.
