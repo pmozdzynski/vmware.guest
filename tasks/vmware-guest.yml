@@ -9,8 +9,8 @@
   register: vmware_guest_folder_name
   ignore_errors: True
 
-- debug:
-    var: vmware_guest_folder_name
+#- debug:
+#    var: vmware_guest_folder_name
 
 
 - name: Create a VM folder on given datacenter
@@ -25,8 +25,8 @@
     state: present
   register: vm_folder_creation_result
 
-- debug:  
-    var: vm_folder_creation_result
+#- debug:  
+#    var: vm_folder_creation_result
 
 - name: create or power-on the VM and wait for the IP address dynamically assigned(DHCP).
   vmware_guest:
