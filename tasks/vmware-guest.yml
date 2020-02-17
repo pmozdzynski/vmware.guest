@@ -20,7 +20,7 @@
     username: '{{ vcenter_username }}'
     password: '{{ vcenter_password }}'
     datacenter: "{{ vcenter_datacenter }}" 
-    folder_name: "/{{ vcenter_datacenter }}/vm/{{ vcenter_folder }}"
+    folder_name: "{{ vcenter_folder }}"
     folder_type: vm
     state: present
   register: vm_folder_creation_result
