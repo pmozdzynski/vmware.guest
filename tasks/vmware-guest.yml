@@ -13,7 +13,22 @@
 #    var: vmware_guest_folder_name
 
 
-- name: create or power-on the VM and wait for the IP address.
+- name: Create a VM folder on given datacenter
+  vcenter_folder:
+    validate_certs: no
+    hostname: '{{ vcenter_hostname }}'
+    username: '{{ vcenter_username }}'
+    password: '{{ vcenter_password }}'
+    datacenter: "{{ vcenter_datacenter }}" 
+    folder_name: "{{ vcenter_folder }}"
+    folder_type: vm
+    state: present
+  register: vm_folder_creation_result
+
+#- debug:  
+#    var: vm_folder_creation_result
+
+- name: create or power-on the VM and wait for the IP address dynamically assigned(DHCP).
   vmware_guest:
     hostname: "{{ vcenter_hostname }}"
     username: "{{ vcenter_username }}" 
@@ -21,7 +36,8 @@
     validate_certs: no
     datacenter: "{{ vcenter_datacenter }}" 
     cluster: "{{ vcenter_cluster }}"
-    folder: "{{ vmware_guest_folder_name.folders | default(vcenter_folder) }}"
+    #folder: "{{ vmware_guest_folder_name.folders | default(vcenter_folder) }}"
+    folder: "/{{ vcenter_datacenter }}/vm/{{ vcenter_folder }}"
     name: "{{ vmguest_name|upper }}"
     name_match: last
     state: "{{ vmguest_state }}"
@@ -31,13 +47,50 @@
       memory_mb: "{{ vmguest_memory }}"
       num_cpus: "{{ vmguest_num_cpu }}"
       scsi: paravirtual
-    networks: "{{ vm_guest_networks }}"
+    networks: "{{ vm_guest_networks_dhcp }}"
     template: "{{ vmguest_template }}"
     customization:
       hostname: "{{ vmguest_name|lower }}"
     wait_for_ip_address: "{{ vmguest_wait_for_ip_address }}"
   register: deploy
-  when: vmguest_state == "poweredon" and esxi_hostname is not defined
+  when: vmguest_state == "poweredon" and esxi_hostname is not defined and vmguest_network_type == "dhcp" 
+
+- name: create or power-on the VM and wait for the IP address (static).
+  vmware_guest:
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}" 
+    password: "{{ vcenter_password }}"
+    validate_certs: no
+    datacenter: "{{ vcenter_datacenter }}" 
+    cluster: "{{ vcenter_cluster }}"
+    folder: "/{{ vcenter_datacenter }}/vm/{{ vcenter_folder }}"
+    name: "{{ vmguest_name|upper }}"
+    name_match: last
+    state: "{{ vmguest_state }}"
+    guest_id: "{{ vmguest_id }}"
+    disk: "{{ vm_guest_disks }}"
+    hardware:
+      memory_mb: "{{ vmguest_memory }}"
+      num_cpus: "{{ vmguest_num_cpu }}"
+      scsi: paravirtual
+    networks: "{{ vm_guest_networks_static }}"
+    template: "{{ vmguest_template }}"
+    customization:
+      hostname: "{{ vmguest_name|lower }}"
+    wait_for_ip_address: "{{ vmguest_wait_for_ip_address }}"
+  register: deploy
+  when: vmguest_state == "poweredon" and esxi_hostname is not defined and vmguest_network_type == "static"
+
+- name: Move Virtual Machine if not in the right folder
+  vmware_guest_move:
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    datacenter: "{{ vcenter_datacenter }}" 
+    validate_certs: no
+    name: "{{ vmguest_name|upper }}"
+    dest_folder: "/{{ vcenter_datacenter }}/vm/{{ vcenter_folder }}"
+    #  delegate_to: localhost
 
 - name: Annouce the ARP/MAC address by pinging the local gateway.
   vmware_vm_shell:
@@ -47,7 +100,7 @@
     validate_certs: no
     datacenter: "{{ vcenter_datacenter }}" 
     cluster: "{{ vcenter_cluster }}"
-    folder: "{{ vmware_guest_folder_name.folders | default(vcenter_folder) }}"
+    folder: "/{{ vcenter_datacenter }}/vm/{{ vcenter_folder }}"
     vm_id: "{{ vmguest_name|upper }}"
     vm_username: "{{ vmguest_template_username }}"
     vm_password: "{{ vmguest_template_password }}"
@@ -64,7 +117,7 @@
     validate_certs: no
     datacenter: "{{ vcenter_datacenter }}" 
     esxi_hostname: "{{ esxi_hostname }}"
-    folder: "{{ vmware_guest_folder_name.folders | default(vcenter_folder) }}"
+    folder: "/{{ vcenter_datacenter }}/vm/{{ vcenter_folder }}"
     name: "{{ vmguest_name|upper }}"
     name_match: last
     state: "{{ vmguest_state }}"
@@ -90,7 +143,7 @@
     validate_certs: no
     datacenter: "{{ vcenter_datacenter }}"
     cluster: "{{ vcenter_cluster }}"
-    folder: "{{ vmware_guest_folder_name.folders | default(vcenter_folder) }}"
+    folder: "/{{ vcenter_datacenter }}/vm/{{ vcenter_folder }}"
     name: "{{ vmguest_name|upper }}"
     state: poweredoff
   when: vmguest_state == "poweredoff" or vmguest_state == "absent" and esxi_hostname is not defined
@@ -103,7 +156,7 @@
     validate_certs: no
     datacenter: "{{ vcenter_datacenter }}"
     cluster: "{{ vcenter_cluster }}"
-    folder: "{{ vmware_guest_folder_name.folders | default(vcenter_folder) }}"
+    folder: "/{{ vcenter_datacenter }}/vm/{{ vcenter_folder }}"
     name: "{{ vmguest_name|upper }}"
     state: absent
   when: vmguest_state == "absent" and delete_machine is defined and esxi_hostname is not defined
