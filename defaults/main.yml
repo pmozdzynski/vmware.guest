@@ -1,6 +1,6 @@
 ---
 vmguest_name: "{{ inventory_hostname_short }}"
-vmguest_ip: "{{ lookup('dig', '{{ inventory_hostname_short }}.{{ ad_domain|lower }}')}}"
+vmguest_ip: "{{ lookup('dig', '{{ inventory_hostname_short }}.{{ vmguest_domain|lower }}')}}"
 vm_guest_disks:
       - size_gb: "{{ vmguest_disk_size }}"
         type: thin
